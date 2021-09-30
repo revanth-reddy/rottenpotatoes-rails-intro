@@ -9,6 +9,34 @@ class MoviesController < ApplicationController
   def index
     @movies = Movie.order(params[:sort])
     @sort_title = params[:sort]
+
+    submit_clicked = params[:submit_clicked]
+    @all_ratings = Movie.select(:rating).map(&:rating).uniq
+    generatedRatings = {}
+    @all_ratings.each{ |rating| generatedRatings[rating] = 1 }
+    
+    ratings = {}
+    
+    if(submit_clicked)
+      if(!params[:ratings])
+        ratings = generatedRatings
+        session[:ratings] = nil
+      else
+        ratings = params[:ratings]
+        session[:ratings] = ratings
+      end
+    elsif(params[:ratings]) 
+      ratings = params[:ratings]
+      session[:ratings] = ratings
+    elsif(session[:ratings])
+      ratings = session[:ratings]
+    else
+      ratings = generatedRatings
+      session[:ratings] = nil
+    end
+
+    @ratings_to_show = ratings == generatedRatings ? [] : ratings.keys
+    @movies = @movies.with_ratings(ratings.keys)
   end
 
   def new
