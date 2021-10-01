@@ -35,7 +35,7 @@ class MoviesController < ApplicationController
       session[:ratings] = nil
     end
 
-    @ratings_to_show = ratings == generatedRatings ? [] : ratings.keys
+    @ratings_to_show = ratings == generatedRatings ? generatedRatings.keys : ratings.keys
     @movies = @movies.with_ratings(ratings.keys)
   end
 
