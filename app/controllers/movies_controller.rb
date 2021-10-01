@@ -7,11 +7,6 @@ class MoviesController < ApplicationController
   end
 
   def index
-    # clear session when at base path and no params are passed
-    if request.env['PATH_INFO'] == '/' and !params[:submit_clicked] and !params[:sort] and !params[:ratings]
-      session.clear
-    end
-
     @sort_by = params[:sort]
     submit_clicked = params[:submit_clicked]
     
