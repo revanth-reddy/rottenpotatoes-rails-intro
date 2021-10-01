@@ -7,16 +7,34 @@ class MoviesController < ApplicationController
   end
 
   def index
-    @movies = Movie.order(params[:sort])
-    @sort_title = params[:sort]
+    # clear session when at base path and no params are passed
+    if request.env['PATH_INFO'] == '/' and !params[:submit_clicked] and !params[:sort] and !params[:ratings]
+      session.clear
+    end
 
+    @sort_by = params[:sort]
     submit_clicked = params[:submit_clicked]
+    
+    # Get all unique ratings
     @all_ratings = Movie.select(:rating).map(&:rating).uniq
+    # Generate ratings that are selected
     generatedRatings = {}
     @all_ratings.each{ |rating| generatedRatings[rating] = 1 }
     
     ratings = {}
-    
+    # Storing and clearing Session based on sort params
+    if(params[:sort])
+      session[:sort_by] = params[:sort]
+      @movies = Movie.order(params[:sort])
+    elsif(session[:sort_by])
+      @movies = Movie.order(session[:sort_by])
+      @sort_by = session[:sort_by]
+    else
+      @movies = Movie.all
+      session[:sort_by] = nil
+    end
+
+    # Saving and retrieving params based on refresh button click
     if(submit_clicked)
       if(!params[:ratings])
         ratings = generatedRatings
