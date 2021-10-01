@@ -32,8 +32,12 @@ class MoviesController < ApplicationController
     # Saving and retrieving params based on refresh button click
     if(submit_clicked)
       if(!params[:ratings])
-        ratings = generatedRatings
-        session[:ratings] = nil
+        if(session[:ratings])
+          ratings = session[:ratings]
+        else
+          ratings = generatedRatings
+          session[:ratings] = nil
+        end
       else
         ratings = params[:ratings]
         session[:ratings] = ratings
